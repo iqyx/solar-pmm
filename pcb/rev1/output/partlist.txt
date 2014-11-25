@@ -1,0 +1,84 @@
+Partlist
+
+Exported from solar-pmic.sch at 11/25/14 1:19 AM
+
+EAGLE Version 7.1.0 Copyright (c) 1988-2014 CadSoft
+
+Assembly variant: 
+
+Part     Value          Device         Package  Library                 Sheet
+
+C1       100nF          C-EUC0603      C0603    rcl                     1
+C2       10nF           C-EUC0603      C0603    rcl                     1
+C3       10nF           C-EUC0603      C0603    rcl                     1
+C4       1uF            C-EUC0603      C0603    rcl                     1
+C5       10nF           C-EUC0603      C0603    rcl                     1
+C6       1uF            C-EUC0603      C0603    rcl                     1
+C7       1uF            C-EUC0603      C0603    rcl                     1
+C8       10uF           C-EUC0805      C0805    rcl                     1
+C9       10uF           C-EUC0805      C0805    rcl                     1
+C10      8.2pF          C-EUC0603      C0603    rcl                     1
+C11      2.2uF          C-EUC0805      C0805    rcl                     1
+C12      36pF           C-EUC0603      C0603    rcl                     1
+C13      1uF            C-EUC0603      C0603    rcl                     1
+C14      10nF           C-EUC0603      C0603    rcl                     1
+C15      10nF           C-EUC0603      C0603    rcl                     1
+C16      100nF          C-EUC0603      C0603    rcl                     1
+C17      100nF          C-EUC0603      C0603    rcl                     1
+C18      10uF           C-EUC0805      C0805    rcl                     1
+C19      10uF           C-EUC0805      C0805    rcl                     1
+C20      10nF           C-EUC0603      C0603    rcl                     1
+C21      10nF           C-EUC0603      C0603    rcl                     1
+C22      100nF          C-EUC0603      C0603    rcl                     1
+C23      10uF           C-EUC0805      C0805    rcl                     1
+C24      10uF           C-EUC0805      C0805    rcl                     1
+C25      10uF           C-EUC0805      C0805    rcl                     1
+C26      100nF          C-EUC0603      C0603    rcl                     1
+C27      100nF          C-EUC0603      C0603    rcl                     1
+D1                      DIODE-MINIMELF MINIMELF diode                   1
+IC2      MCP6002        LT6237CMS8     MSOP8    qyx-misc                1
+IC3      MCP6002        LT6237CMS8     MSOP8    qyx-misc                1
+IC4      LM3671MF-ADJ   LM3671MF       SOT23-5  qyx-misc                1
+IC5      TS520525       TS520525       SOT25    v-reg                   1
+L1       22uH           L-USL3225M     L3225M   rcl                     1
+L2       2.2uH          L-USL3225M     L3225M   rcl                     1
+L3       FB             L-USL2012C     L2012C   rcl                     1
+L4       FB             L-USL2012C     L2012C   rcl                     1
+PAD1                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD2                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD3                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD4                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD5                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD6                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD7                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD8                    2,15/1,0       2,15/1,0 wirepad                 1
+PAD9                    2,15/1,0       2,15/1,0 wirepad                 1
+Q1       BSS123         BSS123         SOT23    transistor-small-signal 1
+R1       470K           R-EU_R0603     R0603    rcl                     1
+R2       470K           R-EU_R0603     R0603    rcl                     1
+R3       470K           R-EU_R0603     R0603    rcl                     1
+R4       100K           R-EU_R0603     R0603    rcl                     1
+R5       1R             R-EU_R0805     R0805    rcl                     1
+R6       47K            R-EU_R0603     R0603    rcl                     1
+R7       47K            R-EU_R0603     R0603    rcl                     1
+R8       470K           R-EU_R0603     R0603    rcl                     1
+R9       470K           R-EU_R0603     R0603    rcl                     1
+R10      470K           R-EU_R0603     R0603    rcl                     1
+R11      470K           R-EU_R0603     R0603    rcl                     1
+R12      100K           R-EU_R0603     R0603    rcl                     1
+R13      0R5            R-EU_R0805     R0805    rcl                     1
+R14      47K            R-EU_R0603     R0603    rcl                     1
+R15      47K            R-EU_R0603     R0603    rcl                     1
+R16      470K           R-EU_R0603     R0603    rcl                     1
+R17      470K           R-EU_R0603     R0603    rcl                     1
+R18      470K           R-EU_R0603     R0603    rcl                     1
+R19      470K           R-EU_R0603     R0603    rcl                     1
+R20      0R2            R-EU_R0805     R0805    rcl                     1
+R21      47K            R-EU_R0603     R0603    rcl                     1
+R22      47K            R-EU_R0603     R0603    rcl                     1
+R23      470K           R-EU_R0603     R0603    rcl                     1
+R24      470K           R-EU_R0603     R0603    rcl                     1
+R25      470K           R-EU_R0603     R0603    rcl                     1
+R26      470K           R-EU_R0603     R0603    rcl                     1
+R27      47R            R-EU_R0603     R0603    rcl                     1
+R28      10K            R-EU_R0603     R0603    rcl                     1
