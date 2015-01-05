@@ -105,7 +105,7 @@ int32_t adc_meas(struct adc_meas_res *res) {
 
 
 int32_t adc_print_res(struct adc_meas_res *res) {
-	chprintf(&SD1,
+	chprintf((struct BaseSequentialStream *)&SD1,
 		"solar_u=%dmV solar_i=%dmA solar_p=%dmW vbat_u=%dmV vbat_i=%dmA vout_u=%dmV vout_i=%dmA\r\n",
 		res->solar_u_mv,
 		res->solar_i_ma,
@@ -133,6 +133,7 @@ int32_t meas_available_power(int16_t *max_power, uint8_t *max_power_pwm) {
 		pwm_set(i);
 		chThdSleepMilliseconds(1);
 		adc_meas(&a);
+		adc_print_res(&a);
 		int16_t curr_power = (a.solar_i_ma * a.solar_u_mv / 1000);
 
 		if (curr_power > *max_power) {
@@ -146,40 +147,69 @@ int32_t meas_available_power(int16_t *max_power, uint8_t *max_power_pwm) {
 }
 
 
-int32_t perturb_observe(int16_t *max_power, uint8_t *max_power_pwm) {
-	struct adc_meas_res a;
+struct mppt_ic_context {
 
-	uint8_t pwm_a = 0;
-	uint8_t pwm_b = 0;
+	/* lastly measured solar power (voltage and current) */
+	int16_t last_u_mv;
+	int16_t last_i_ma;
 
-	if (*max_power_pwm >= 2) {
-		pwm_a = *max_power_pwm - 2;
-	} else {
-		pwm_a = 0;
-	}
+	/* actual converter pwm */
+	uint8_t pwm;
 
-	if (*max_power_pwm <= (PWM_MAX - (PWM_MAX / 10) - 2)) {
-		pwm_b = *max_power_pwm + 2;
-	} else {
-		pwm_b = (PWM_MAX - (PWM_MAX / 10));
-	}
+};
 
-	//~ *max_power = 0;
-	//~ (*max_power)--;
+int32_t mppt_ic_init(struct mppt_ic_context *ctx) {
+	ctx->last_u_mv = 0;
+	ctx->last_i_ma = 0;
+	ctx->pwm = 0;
 
-	for (uint8_t i = pwm_a; i <= pwm_b; i++) {
-		//~ chprintf(&SD1, "try pwm %d\r\n", i);
-		pwm_set(i);
-		chThdSleepMilliseconds(1);
-		adc_meas(&a);
-		//~ adc_print_res(&a);
-		int16_t curr_power = (a.solar_i_ma * a.solar_u_mv / 1000);
+	return 0;
+}
 
-		if (curr_power > *max_power) {
-			*max_power = curr_power;
-			*max_power_pwm = i;
+
+int32_t mppt_ic_step(struct mppt_ic_context *ctx, struct adc_meas_res *meas) {
+
+	int16_t du = meas->solar_u_mv - ctx->last_u_mv;
+	int16_t di = meas->solar_i_ma - ctx->last_i_ma;
+
+	if (du == 0) {
+		if (di == 0) {
+			/* do nothing */
+		} else {
+			if (di > 0) {
+				if (ctx->pwm > 0) {
+					ctx->pwm--;
+				}
+			} else {
+				ctx->pwm++;
+			}
 		}
+	} else {
+		int32_t didu = ((int32_t)di * 1000) / ((int32_t)du);
+		int32_t m_iu = (-((int32_t)meas->solar_i_ma) * 1000) / ((int32_t)meas->solar_u_mv);
+		//~ chprintf((struct BaseSequentialStream *)&SD1, "didu=%d m_iu=%d\r\n", didu, m_iu);
+
+		if (didu == m_iu) {
+			/* do nothing */
+		} else {
+			if (didu > m_iu) {
+				if (ctx->pwm > 0) {
+					ctx->pwm--;
+				}
+			} else {
+				ctx->pwm++;
+			}
+		}
+
 	}
+
+	/* crop pwm to avoid short circuit */
+	if (ctx->pwm > (PWM_MAX - (PWM_MAX / 10))) {
+		ctx->pwm = (PWM_MAX - (PWM_MAX / 10));
+	}
+
+	ctx->last_i_ma = meas->solar_i_ma;
+	ctx->last_u_mv = meas->solar_u_mv;
 
 	return 0;
 }
@@ -190,25 +220,30 @@ static msg_t Thread1(void *arg) {
 	(void)arg;
 	chRegSetThreadName("blinker");
 
-	int16_t max_power = 0;
-	uint8_t max_power_pwm = 0;
-	uint16_t cnt = 0;
-
-	meas_available_power(&max_power, &max_power_pwm);
-	pwm_set(max_power_pwm);
+	uint8_t cnt = 0;
+	struct adc_meas_res meas;
+	struct mppt_ic_context mppt;
+	mppt_ic_init(&mppt);
+	mppt.pwm = 5;
 
 	while (1) {
-		perturb_observe(&max_power, &max_power_pwm);
-		pwm_set(max_power_pwm);
-		chprintf(&SD1, "changing pwm to %d for max power %dmW\r\n", max_power_pwm, max_power);
+		adc_meas(&meas);
+		//~ adc_print_res(&meas);
+		mppt_ic_step(&mppt, &meas);
 
-		if ((cnt % 100) == 0) {
-			meas_available_power(&max_power, &max_power_pwm);
-			pwm_set(max_power_pwm);
+		if (meas.vbat_u_mv >= 4200) {
+			pwm_set(0);
+		} else {
+			pwm_set(mppt.pwm);
+		}
+		chprintf((struct BaseSequentialStream *)&SD1, "pwm=%d, power=%dmW\r\n", mppt.pwm, (mppt.last_i_ma * mppt.last_u_mv) / 1000);
+
+		if ((cnt % 10) == 0) {
+			adc_print_res(&meas);
 		}
 
-		chThdSleepMilliseconds(100);
 		cnt++;
+		chThdSleepMilliseconds(100);
 	}
 }
 
@@ -238,10 +273,10 @@ int main(void) {
 	palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
 	palSetPad(GPIOA, 7);
 
-	chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
 	pwm_enable();
 	pwm_set(0);
+
+	chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
 	while (1) {
 		chThdSleepMilliseconds(200);
